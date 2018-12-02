@@ -28,6 +28,9 @@ setup(
             'pylint'
         ]
     },
+    install_requires=[
+        'wpconfigr~=1.0.0'
+    ],
     name='wordpressbackup',
     license='MIT',
     long_description=LONG_DESCRIPTION,
