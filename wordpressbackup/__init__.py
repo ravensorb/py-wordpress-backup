@@ -13,7 +13,7 @@ from wpconfigr import WpConfigFile
 LOG = logging.getLogger(__name__)
 
 
-def _dump_database(wp_config_filename):
+def _dump_database(wp_config_filename, dump_filename):
     wp_config = WpConfigFile(wp_config_filename)
 
     args = [
@@ -25,12 +25,10 @@ def _dump_database(wp_config_filename):
         wp_config.get('DB_USER'),
         '-p',
         wp_config.get('DB_NAME'),
-        '-p' + wp_config.get('DB_PASSWORD'),
-        '>',
-        'database.sql'
+        '-p' + wp_config.get('DB_PASSWORD')
     ]
 
-    LOG.info('Dumping database...')
+    LOG.info('Getting database dump...')
 
     try:
         completed = subprocess.run(args, capture_output=True)
@@ -42,6 +40,13 @@ def _dump_database(wp_config_filename):
     if completed.returncode != 0:
         LOG.fatal('Database backup failed.\n\nmysqldump stdout:\n%s\n\nmysql stderr:\n%s', completed.stdout, completed.stderr)
         exit(2)
+
+    LOG.info('Saving database dump to "%s"...', dump_filename)
+
+    with open(dump_filename, 'w') as stream:
+        stream.write(completed.stdout)
+
+    LOG.info('Database dump complete.')
 
 
 def backup(wp_config_filename, archive_filename):
