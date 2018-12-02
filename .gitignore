@@ -1,0 +1,8 @@
+__pycache__
+.coverage
+.DS_Store
+.vscode
+build
+dist
+htmlcov
+*.egg-info
