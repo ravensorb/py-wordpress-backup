@@ -57,7 +57,7 @@ def backup(wp_config_filename, archive_filename):
 
     LOG.info('Will build the archive content in: %s', temp_dir.name)
 
-    db_dump_filename = os.path.join(temp_dir, 'database.sql')
+    db_dump_filename = os.path.join(temp_dir.name, 'database.sql')
 
     _dump_database(wp_config_filename=wp_config_filename,
                    db_dump_filename=db_dump_filename)
