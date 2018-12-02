@@ -34,6 +34,7 @@ def _dump_database(wp_config_filename):
     try:
         completed = subprocess.run(args, capture_output=True)
     except FileNotFoundError as error:
+        LOG.fatal(error)
         LOG.fatal('mysqldump was not found. Please install it and try again.')
         exit(1)
 
