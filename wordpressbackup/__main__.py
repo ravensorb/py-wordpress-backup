@@ -28,13 +28,17 @@ def run_from_cli():
                             action='store_true',
                             help='Perform a restoration')
 
-    arg_parser.add_argument('--wp-config',
-                            help='Path and filename of wp-config.php',
+    # arg_parser.add_argument('--wp-config',
+    #                         help='Path and filename of wp-config.php',
+    #                         required=True)
+
+    arg_parser.add_argument('--wp-dir',
+                            help='Path to the root of the WordPress directory',
                             required=True)
 
     arg_parser.add_argument('--archive',
-                            help='Path and filename of the archive to backup '
-                                 'to/restore from.',
+                            help='Path and filename of the archive (.tar.gz) '
+                                 'to backup to/restore from.',
                             required=True)
 
     arg_parser.add_argument('--log-level',
@@ -50,19 +54,10 @@ def run_from_cli():
     if args.backup == args.restore:
         arg_parser.error('Must specify either --backup or --restore.')
 
-    # if args.set_true and args.set_false:
-    #     arg_parser.error('Cannot set --set-true and --set-false.')
-
-    # if args.value and args.set_true:
-    #     arg_parser.error('Cannot set --value and --set-true.')
-
-    # if args.value and args.set_false:
-    #     arg_parser.error('Cannot set --value and --set-false.')
-
     basicConfig(level=str(args.log_level).upper())
 
     if args.backup:
-        wordpressbackup.backup(wp_config_filename=args.wp_config,
+        wordpressbackup.backup(wp_directory=args.wp_dir,
                                archive_filename=args.archive)
 
 

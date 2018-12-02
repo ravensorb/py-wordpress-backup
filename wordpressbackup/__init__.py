@@ -10,6 +10,8 @@ import tempfile
 
 from wpconfigr import WpConfigFile
 
+from wordpressbackup.exceptions import WpConfigNotFoundError
+
 LOG = logging.getLogger(__name__)
 
 
@@ -38,12 +40,13 @@ def _dump_database(wp_config_filename, db_dump_filename):
         exit(1)
 
     if completed.returncode != 0:
-        LOG.fatal('Database backup failed.\n\nmysqldump stdout:\n%s\n\nmysql stderr:\n%s', completed.stdout, completed.stderr)
+        LOG.fatal('Database backup failed.\n\nmysqldump stdout:\n%s\n\nmysql '
+                  'stderr:\n%s',
+                  completed.stdout,
+                  completed.stderr)
         exit(2)
 
     LOG.info('Saving database dump to "%s"...', db_dump_filename)
-
-    LOG.info(completed.stdout)
 
     with open(db_dump_filename, 'wb') as stream:
         stream.write(completed.stdout)
@@ -51,7 +54,7 @@ def _dump_database(wp_config_filename, db_dump_filename):
     LOG.info('Database dump complete.')
 
 
-def backup(wp_config_filename, archive_filename):
+def backup(wp_directory, archive_filename):
 
     LOG.info('Starting backup.')
 
@@ -61,12 +64,24 @@ def backup(wp_config_filename, archive_filename):
 
     db_dump_filename = os.path.join(temp_dir.name, 'database.sql')
 
+    wp_config_filename = os.path.join(wp_directory, 'wp-config.php')
+
+    if not os.path.exists(wp_config_filename):
+        raise WpConfigNotFoundError(wp_directory=wp_directory)
+
     _dump_database(wp_config_filename=wp_config_filename,
                    db_dump_filename=db_dump_filename)
 
     LOG.info('Creating archive: %s', archive_filename)
+    with tarfile.open(archive_filename, 'w:gz') as stream:
+        LOG.info('Adding database dump "%s" to archive "%s"...',
+                 db_dump_filename,
+                 archive_filename)
+        stream.add(db_dump_filename)
 
-    with tarfile.open(archive_filename, 'w') as stream:
-        stream.add(temp_dir.name)
+        LOG.info('Adding WordPress directory "%s" to archive "%s"...',
+                 wp_directory,
+                 archive_filename)
+        stream.add(wp_directory)
 
     LOG.info('Backup complete.')
