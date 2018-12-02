@@ -43,7 +43,9 @@ def _dump_database(wp_config_filename, db_dump_filename):
 
     LOG.info('Saving database dump to "%s"...', db_dump_filename)
 
-    with open(db_dump_filename, 'w') as stream:
+    LOG.info(completed.stdout)
+
+    with open(db_dump_filename, 'wb') as stream:
         stream.write(completed.stdout)
 
     LOG.info('Database dump complete.')
