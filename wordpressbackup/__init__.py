@@ -77,11 +77,11 @@ def backup(wp_directory, archive_filename):
         LOG.info('Adding database dump "%s" to archive "%s"...',
                  db_dump_filename,
                  archive_filename)
-        stream.add(db_dump_filename)
+        stream.add(db_dump_filename, arcname=db_dump_filename)
 
         LOG.info('Adding WordPress directory "%s" to archive "%s"...',
                  wp_directory,
                  archive_filename)
-        stream.add(wp_directory)
+        stream.add(wp_directory, arcname=wp_directory)
 
     LOG.info('Backup complete.')
