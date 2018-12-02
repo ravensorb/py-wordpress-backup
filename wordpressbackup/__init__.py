@@ -17,6 +17,7 @@ def _dump_database(wp_config_filename):
     wp_config = WpConfigFile(wp_config_filename)
 
     args = [
+        'mysqldump',
         '--add-drop-table',
         '-h',
         wp_config.get('DB_HOST'),
