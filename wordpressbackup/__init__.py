@@ -3,17 +3,17 @@
 """
 
 import logging
+import os
 import subprocess
+import tarfile
+import tempfile
 
 from wpconfigr import WpConfigFile
-
-# from wpconfigr.wp_config_string import WpConfigString
-# from wpconfigr.wp_config_file import WpConfigFile
 
 LOG = logging.getLogger(__name__)
 
 
-def _dump_database(wp_config_filename, dump_filename):
+def _dump_database(wp_config_filename, db_dump_filename):
     wp_config = WpConfigFile(wp_config_filename)
 
     args = [
@@ -41,15 +41,30 @@ def _dump_database(wp_config_filename, dump_filename):
         LOG.fatal('Database backup failed.\n\nmysqldump stdout:\n%s\n\nmysql stderr:\n%s', completed.stdout, completed.stderr)
         exit(2)
 
-    LOG.info('Saving database dump to "%s"...', dump_filename)
+    LOG.info('Saving database dump to "%s"...', db_dump_filename)
 
-    with open(dump_filename, 'w') as stream:
-        stream.write(completed.stdout)
+    with open(db_dump_filename, 'w') as stream:
+        stream.writable(completed.stdout)
 
     LOG.info('Database dump complete.')
 
 
 def backup(wp_config_filename, archive_filename):
 
-    _dump_database(wp_config_filename)
+    LOG.info('Starting backup.')
+
+    temp_dir = tempfile.TemporaryDirectory()
+
+    LOG.info('Will build the archive content in: %s', temp_dir.name)
+
+    db_dump_filename = os.path.join(temp_dir, 'database.sql')
+
+    _dump_database(wp_config_filename=wp_config_filename,
+                   db_dump_filename=db_dump_filename)
+
+    LOG.info('Creating archive: %s', archive_filename)
+
+    with tarfile.open(archive_filename, 'w') as stream:
+        stream.add(temp_dir.name)
+
     LOG.info('Backup complete.')
