@@ -139,7 +139,7 @@ def restore(wp_directory, archive_filename):
     #          wp_dir_actual_name,
     #          wp_dir_root_path)
 
-    LOG.info('Removing "%s"...')
+    LOG.info('Removing existing WordPress content at "%s"...', wp_directory)
     shutil.rmtree(wp_directory)
 
     LOG.info('Opening archive: %s', archive_filename)
@@ -152,7 +152,14 @@ def restore(wp_directory, archive_filename):
         LOG.info('Extracting WordPress directory "%s" to "%s"...',
                  WP_DIR_ARCNAME,
                  wp_directory)
-        stream.extract(WP_DIR_ARCNAME, path=wp_directory)
+
+        wp_members = [
+            member for member in stream.getmembers()
+            if member.name.startswith(WP_DIR_ARCNAME)
+        ]
+        stream.extractall(members=wp_members)
+
+
 
 
     # LOG.info('Moving the content of "%s" to "%s"...')
