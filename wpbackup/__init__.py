@@ -157,6 +157,7 @@ def restore(wp_directory, archive_filename):
             member for member in stream.getmembers()
             if member.name.startswith(WP_DIR_ARCNAME)
         ]
+        LOG.info('Extracting: %s', wp_members)
         stream.extractall(members=wp_members)
 
 
