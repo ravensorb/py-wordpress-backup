@@ -159,27 +159,14 @@ def restore(wp_directory, archive_filename):
             if member.name.startswith(WP_DIR_ARCNAME)
         ]
         LOG.info('Extracting: %s', wp_members)
-        stream.extractall(members=wp_members)
+        stream.extractall(members=wp_members, path=wp_directory)
 
 
 
-
-    # LOG.info('Moving the content of "%s" to "%s"...')
-    # shutil.move(tmp_wp_dir_path, wp_directory)
-
-
-    # db_dump_filename = os.path.join(temp_dir.name, 'database.sql')
-
-    # wp_config_filename = os.path.join(wp_directory, 'wp-config.php')
-
-    # if not os.path.exists(wp_config_filename):
-    #     raise WpConfigNotFoundError(wp_directory=wp_directory)
 
     # _dump_database(wp_config_filename=wp_config_filename,
     #                db_dump_filename=db_dump_filename)
 
-    # db_dump_arcname = 'database.sql'
-    # wp_dir_arcname = 'wordpress-root'
 
 
 
