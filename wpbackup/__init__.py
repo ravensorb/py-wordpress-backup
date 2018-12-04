@@ -128,6 +128,14 @@ def restore(wp_directory, archive_filename):
 
     LOG.info('Will extract the database dump to: %s', db_dump_path)
 
+    wp_dir_root_path = os.path.join('..', wp_directory)
+    wp_dir_actual_name = os.path.basename(wp_directory)
+
+    LOG.info('Will extract the WordPress content to a directory named "%s" '
+             'in "%s".',
+             wp_dir_actual_name,
+             wp_dir_root_path)
+
     LOG.info('Opening archive: %s', archive_filename)
 
     with tarfile.open(archive_filename, 'r:gz') as stream:
@@ -139,7 +147,7 @@ def restore(wp_directory, archive_filename):
         LOG.info('Extracting WordPress directory "%s" to "%s"...',
                  WP_DIR_ARCNAME,
                  wp_directory)
-        stream.extract(WP_DIR_ARCNAME, path=wp_directory)
+        stream.extract(WP_DIR_ARCNAME + '/*', path=wp_directory)
 
 
     # db_dump_filename = os.path.join(temp_dir.name, 'database.sql')
