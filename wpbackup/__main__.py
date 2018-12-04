@@ -51,9 +51,6 @@ def run_from_cli():
 
     args = arg_parser.parse_args()
 
-    if args.restore:
-        arg_parser.error('Restoration is not yet supported.')
-
     if args.backup == args.restore:
         arg_parser.error('Must specify either --backup or --restore.')
 
