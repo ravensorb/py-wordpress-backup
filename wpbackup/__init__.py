@@ -5,6 +5,7 @@ content.
 
 import logging
 import os
+import shutil
 import subprocess
 import tarfile
 import tempfile
@@ -125,19 +126,23 @@ def restore(wp_directory, archive_filename):
     LOG.info('Will build the archive content in: %s', temp_dir.name)
 
     db_dump_path = os.path.join(temp_dir.name, 'database.sql')
-
     LOG.info('Will extract the database dump to: %s', db_dump_path)
 
-    wp_dir_root_path = os.path.join('..', wp_directory)
-    wp_dir_actual_name = os.path.basename(wp_directory)
+    tmp_wp_dir_path = os.path.join(temp_dir.name, WP_DIR_ARCNAME)
+    LOG.info('Will extract the WordPress content to: %s', tmp_wp_dir_path)
 
-    LOG.info('Will extract the WordPress content to a directory named "%s" '
-             'in "%s".',
-             wp_dir_actual_name,
-             wp_dir_root_path)
+    # wp_dir_root_path = os.path.join('..', wp_directory)
+    # wp_dir_actual_name = os.path.basename(wp_directory)
+
+    # LOG.info('Will extract the WordPress content to a directory named "%s" '
+    #          'in "%s".',
+    #          wp_dir_actual_name,
+    #          wp_dir_root_path)
+
+    LOG.info('Removing "%s"...')
+    shutil.rmtree(wp_directory)
 
     LOG.info('Opening archive: %s', archive_filename)
-
     with tarfile.open(archive_filename, 'r:gz') as stream:
         LOG.info('Extracting database dump "%s" to "%s"...',
                  DB_DUMP_ARCNAME,
@@ -147,7 +152,11 @@ def restore(wp_directory, archive_filename):
         LOG.info('Extracting WordPress directory "%s" to "%s"...',
                  WP_DIR_ARCNAME,
                  wp_directory)
-        stream.extract(WP_DIR_ARCNAME + '/*', path=wp_directory)
+        stream.extract(WP_DIR_ARCNAME, path=wp_directory)
+
+
+    # LOG.info('Moving the content of "%s" to "%s"...')
+    # shutil.move(tmp_wp_dir_path, wp_directory)
 
 
     # db_dump_filename = os.path.join(temp_dir.name, 'database.sql')
