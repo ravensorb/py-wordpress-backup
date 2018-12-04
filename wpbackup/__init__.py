@@ -56,6 +56,17 @@ def _dump_database(wp_config_filename, db_dump_filename):
 
 
 def backup(wp_directory, archive_filename):
+    """
+    Performs a backup.
+
+    Args:
+        wp_directory (str):     Root WordPress directory.
+        archive_filename (str): Path and filename of tar gzip file to create.
+
+    Raises:
+        WpConfigNotFoundError:  wp-config.php was not found.
+    """
+
 
     LOG.info('Starting backup.')
 
@@ -73,16 +84,24 @@ def backup(wp_directory, archive_filename):
     _dump_database(wp_config_filename=wp_config_filename,
                    db_dump_filename=db_dump_filename)
 
+
+    db_dump_arcname = os.path.basename(db_dump_filename)
+    wp_dir_arcname = os.path.basename(wp_directory)
+
     LOG.info('Creating archive: %s', archive_filename)
     with tarfile.open(archive_filename, 'w:gz') as stream:
-        LOG.info('Adding database dump "%s" to archive "%s"...',
+        LOG.info('Adding database dump "%s" to archive "%s" with arcname '
+                 '"%s"...',
                  db_dump_filename,
-                 archive_filename)
-        stream.add(db_dump_filename, arcname=db_dump_filename)
+                 archive_filename,
+                 db_dump_arcname)
+        stream.add(db_dump_filename, arcname=db_dump_arcname)
 
-        LOG.info('Adding WordPress directory "%s" to archive "%s"...',
+        LOG.info('Adding WordPress directory "%s" to archive "%s" with '
+                 'arcname "%s"...',
                  wp_directory,
-                 archive_filename)
-        stream.add(wp_directory, arcname=wp_directory)
+                 archive_filename,
+                 wp_dir_arcname)
+        stream.add(wp_directory, arcname=wp_dir_arcname)
 
     LOG.info('Backup complete.')
