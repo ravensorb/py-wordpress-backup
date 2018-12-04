@@ -1,5 +1,5 @@
 """
-"wordpressbackup" package setup.
+"wpbackup" package setup.
 """
 
 from setuptools import setup
@@ -31,14 +31,14 @@ setup(
     install_requires=[
         'wpconfigr~=1.0.0'
     ],
-    name='wordpressbackup',
+    name='wpbackup',
     license='MIT',
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
     packages=[
-        'wordpressbackup',
-        'wordpressbackup.exceptions'
+        'wpbackup',
+        'wpbackup.exceptions'
     ],
-    url='https://github.com/cariad/py-wordpressbackup',
+    url='https://github.com/cariad/py-wordpress-backup',
     version='0.1'
 )

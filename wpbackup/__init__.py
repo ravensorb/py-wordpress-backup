@@ -10,7 +10,7 @@ import tempfile
 
 from wpconfigr import WpConfigFile
 
-from wordpressbackup.exceptions import WpConfigNotFoundError
+from wpbackup.exceptions import WpConfigNotFoundError
 
 LOG = logging.getLogger(__name__)
 
