@@ -139,8 +139,9 @@ def restore(wp_directory, archive_filename):
     #          wp_dir_actual_name,
     #          wp_dir_root_path)
 
-    LOG.info('Removing existing WordPress content at "%s"...', wp_directory)
-    shutil.rmtree(wp_directory)
+    if os.path.exists(wp_directory):
+        LOG.info('Removing existing WordPress content at "%s"...', wp_directory)
+        shutil.rmtree(wp_directory)
 
     LOG.info('Opening archive: %s', archive_filename)
     with tarfile.open(archive_filename, 'r:gz') as stream:
