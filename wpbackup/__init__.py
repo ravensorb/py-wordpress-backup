@@ -142,7 +142,7 @@ def restore(wp_directory, archive_filename):
         LOG.info('Extracting WordPress directory "%s" to "%s"...',
                  WP_DIR_ARCNAME,
                  wp_directory)
-        stream.extract(DB_DUMP_ARCNAME, path=wp_directory)
+        stream.extract(WP_DIR_ARCNAME, path=wp_directory)
 
 
     # db_dump_filename = os.path.join(temp_dir.name, 'database.sql')
