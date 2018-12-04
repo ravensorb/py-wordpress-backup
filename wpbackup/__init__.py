@@ -154,20 +154,19 @@ def restore(wp_directory, archive_filename):
                  WP_DIR_ARCNAME,
                  wp_directory)
 
-        wp_members = [
-            member for member in stream.getmembers()
-            if member.name.startswith(WP_DIR_ARCNAME)
-        ]
-        LOG.info('Extracting: %s', wp_members)
+        root_dir = WP_DIR_ARCNAME + os.path.sep
+        root_dir_len = len(root_dir)
+
+        wp_members = []
+
+        for member in stream.getmembers():
+            if member.path.startswith(root_dir):
+                member.path = member.path[root_dir_len:]
+                wp_members.append(member)
+
         stream.extractall(members=wp_members, path=wp_directory)
-
-
-
 
     # _dump_database(wp_config_filename=wp_config_filename,
     #                db_dump_filename=db_dump_filename)
-
-
-
 
     LOG.info('Restoration complete.')
