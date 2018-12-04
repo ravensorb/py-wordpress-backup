@@ -87,9 +87,6 @@ def backup(wp_directory, archive_filename):
     _dump_database(wp_config_filename=wp_config_filename,
                    db_dump_filename=db_dump_path)
 
-
-    wp_dir_arcname = 'wordpress-root'
-
     LOG.info('Creating archive: %s', archive_filename)
     with tarfile.open(archive_filename, 'w:gz') as stream:
         LOG.info('Adding database dump "%s" to archive "%s" with arcname '
@@ -103,8 +100,8 @@ def backup(wp_directory, archive_filename):
                  'arcname "%s"...',
                  wp_directory,
                  archive_filename,
-                 wp_dir_arcname)
-        stream.add(wp_directory, arcname=wp_dir_arcname)
+                 WP_DIR_ARCNAME)
+        stream.add(wp_directory, arcname=WP_DIR_ARCNAME)
 
     LOG.info('Backup complete.')
 
