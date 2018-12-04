@@ -127,7 +127,9 @@ def restore(wp_directory, archive_filename):
 
     LOG.info('Will build the archive content in: %s', temp_dir.name)
 
-    db_dump_path = os.path.join(temp_dir, 'database.sql')
+    db_dump_path = os.path.join(temp_dir.name, 'database.sql')
+
+    LOG.info('Will extract the database dump to: %s', db_dump_path)
 
     LOG.info('Opening archive: %s', archive_filename)
 
