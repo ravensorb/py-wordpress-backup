@@ -68,7 +68,9 @@ def run_from_cli():
     if args.backup:
         wpbackup.backup(wp_directory=args.wp_dir,
                         archive_filename=args.archive)
-
+    elif args.restore:
+        wpbackup.restore(wp_directory=args.wp_dir,
+                         archive_filename=args.archive)
 
 if __name__ == '__main__':
     run_from_cli()
