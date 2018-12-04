@@ -3,10 +3,11 @@ Update a wp-config.php file.
 """
 
 import argparse
+import logging
 
-from logging import basicConfig
+import chesney
 
-import wordpressbackup
+import wpbackup
 
 
 def run_from_cli():
@@ -28,10 +29,6 @@ def run_from_cli():
                             action='store_true',
                             help='Perform a restoration')
 
-    # arg_parser.add_argument('--wp-config',
-    #                         help='Path and filename of wp-config.php',
-    #                         required=True)
-
     arg_parser.add_argument('--wp-dir',
                             help='Path to the root of the WordPress directory',
                             required=True)
@@ -46,6 +43,12 @@ def run_from_cli():
                             help='Log level',
                             required=False)
 
+    arg_parser.add_argument('--only-appointed-in-asg',
+                            action='store_true',
+                            help='Ensure that only one AWS EC2 instance in '
+                                 'this auto-scaling group performs the '
+                                 'action.')
+
     args = arg_parser.parse_args()
 
     if args.restore:
@@ -54,11 +57,17 @@ def run_from_cli():
     if args.backup == args.restore:
         arg_parser.error('Must specify either --backup or --restore.')
 
-    basicConfig(level=str(args.log_level).upper())
+    logging.basicConfig(level=str(args.log_level).upper())
+    log = logging.getLogger(__name__)
+
+    if args.only_appointed_in_asg:
+        if not chesney.is_appointed():
+            log.fatal('This EC2 instance is not appointed.')
+            exit(0)
 
     if args.backup:
-        wordpressbackup.backup(wp_directory=args.wp_dir,
-                               archive_filename=args.archive)
+        wpbackup.backup(wp_directory=args.wp_dir,
+                        archive_filename=args.archive)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,6 @@
-# py-wordpressbackup
+# py-wordpress-backup
 
-[![CircleCI](https://circleci.com/gh/cariad/py-wordpressbackup/tree/master.svg?style=svg)](https://circleci.com/gh/cariad/py-wordpressbackup/tree/master)
+[![CircleCI](https://circleci.com/gh/cariad/py-wordpress-backup/tree/master.svg?style=svg)](https://circleci.com/gh/cariad/py-wordpress-backup/tree/master)
 
 A Python package for backing up and restoring all your self-hosted WordPress content.
 

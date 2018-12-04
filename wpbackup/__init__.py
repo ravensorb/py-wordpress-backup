@@ -1,5 +1,6 @@
 """
-"wordpressbackup" package.
+A Python package for backing up and restoring all your self-hosted WordPress
+content.
 """
 
 import logging

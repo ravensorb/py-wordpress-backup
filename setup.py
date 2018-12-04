@@ -29,6 +29,7 @@ setup(
         ]
     },
     install_requires=[
+        'chesney~=1.0.0',
         'wpconfigr~=1.0.0'
     ],
     name='wpbackup',
