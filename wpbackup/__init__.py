@@ -60,6 +60,50 @@ def _dump_database(wp_config_filename, db_dump_filename):
     LOG.info('Database dump complete.')
 
 
+def _restore_database(wp_config_filename, db_dump_filename):
+    wp_config = WpConfigFile(wp_config_filename)
+
+    cmd = ('CREATE DATABASE IF NOT EXISTS {db_name}; '
+           'use {db_name}; '
+           'source {db_dump};').format(
+        db_name=wp_config.get('DB_NAME'),
+        db_dump=db_dump_filename)
+
+    args = [
+        'mysql',
+        '--host',
+        wp_config.get('DB_HOST'),
+        '--user',
+        admin_user,
+        '-p' + admin_password,
+        '--execute',
+        cmd
+    ]
+
+    LOG.info('Getting database dump...')
+
+    try:
+        completed = subprocess.run(args, capture_output=True)
+    except FileNotFoundError as error:
+        LOG.fatal(error)
+        LOG.fatal('mysqldump was not found. Please install it and try again.')
+        exit(1)
+
+    if completed.returncode != 0:
+        LOG.fatal('Database backup failed.\n\nmysqldump stdout:\n%s\n\nmysql '
+                  'stderr:\n%s',
+                  completed.stdout,
+                  completed.stderr)
+        exit(2)
+
+    LOG.info('Saving database dump to "%s"...', db_dump_filename)
+
+    with open(db_dump_filename, 'wb') as stream:
+        stream.write(completed.stdout)
+
+    LOG.info('Database dump complete.')
+
+
 def backup(wp_directory, archive_filename):
     """
     Performs a backup.
@@ -165,8 +209,5 @@ def restore(wp_directory, archive_filename):
                 wp_members.append(member)
 
         stream.extractall(members=wp_members, path=wp_directory)
-
-    # _dump_database(wp_config_filename=wp_config_filename,
-    #                db_dump_filename=db_dump_filename)
 
     LOG.info('Restoration complete.')

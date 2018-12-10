@@ -29,8 +29,8 @@ setup(
         ]
     },
     install_requires=[
-        'chesney~=1.0.0',
-        'wpconfigr~=1.0.0'
+        'chesney~=1.0',
+        'wpconfigr~=1.0'
     ],
     name='wpbackup',
     license='MIT',
