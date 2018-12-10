@@ -10,6 +10,7 @@ import chesney
 import wpbackup
 
 
+
 def run_from_cli():
     """
     Perform a backup or restore instigated from a CLI.
@@ -37,6 +38,27 @@ def run_from_cli():
                             help='Path and filename of the archive (.tar.gz) '
                                  'to backup to/restore from.',
                             required=True)
+
+    arg_parser.add_argument('--admin-username',
+                            help='Database admin username. Required only for '
+                                 'restorations.',
+                            required=False)
+
+    arg_parser.add_argument('--admin-password',
+                            help='Database admin password. Required only for '
+                                 'restorations.',
+                            required=False)
+
+    arg_parser.add_argument('--admin-credentials-aws-secret-id',
+                            help='Database admin credentials secret ID. '
+                                 'Required only for restorations.',
+                            required=False)
+
+    arg_parser.add_argument('--admin-credentials-aws-secret-region',
+                            help='Region in which the database admin '
+                                 'credentials secret resides. Required only '
+                                 'for restorations.',
+                            required=False)
 
     arg_parser.add_argument('--log-level',
                             default='CRITICAL',
@@ -66,8 +88,21 @@ def run_from_cli():
         wpbackup.backup(wp_directory=args.wp_dir,
                         archive_filename=args.archive)
     elif args.restore:
+
+        if args.admin_credentials_aws_secret_id:
+            admin_credentials = wpbackup.Credentials.from_aws_secrets_manager(
+                secret_id=args.admin_credentials_aws_secret_id,
+                region=args.admin_credentials_aws_secret_region
+            )
+        else:
+            admin_credentials = wpbackup.Credentials.from_username_and_password(
+                username=args.admin_username,
+                password=args.admin_password
+            )
+
         wpbackup.restore(wp_directory=args.wp_dir,
-                         archive_filename=args.archive)
+                         archive_filename=args.archive,
+                         admin_credentials=admin_credentials)
 
 if __name__ == '__main__':
     run_from_cli()

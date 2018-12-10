@@ -11,6 +11,7 @@ import tarfile
 import tempfile
 
 from wpconfigr import WpConfigFile
+from wpdatabase.classes import Credentials
 
 from wpbackup.exceptions import WpConfigNotFoundError
 
@@ -60,27 +61,32 @@ def _dump_database(wp_config_filename, db_dump_filename):
     LOG.info('Database dump complete.')
 
 
-def _restore_database(wp_config_filename, db_dump_filename):
+def _restore_database(wp_config_filename, db_dump_filename, admin_credentials):
     wp_config = WpConfigFile(wp_config_filename)
 
-    cmd = ('CREATE DATABASE IF NOT EXISTS {db_name}; '
-           'use {db_name}; '
-           'source {db_dump};').format(
+    cmd_template = (
+        'CREATE DATABASE IF NOT EXISTS {db_name}; '
+        'use {db_name}; '
+        'source {db_dump};'
+    )
+
+    cmd = cmd_template.format(
         db_name=wp_config.get('DB_NAME'),
-        db_dump=db_dump_filename)
+        db_dump=db_dump_filename
+    )
 
     args = [
         'mysql',
         '--host',
         wp_config.get('DB_HOST'),
         '--user',
-        admin_user,
-        '-p' + admin_password,
+        admin_credentials.username,
+        '-p' + admin_credentials.password,
         '--execute',
         cmd
     ]
 
-    LOG.info('Getting database dump...')
+    LOG.info('Restoring from database dump...')
 
     try:
         completed = subprocess.run(args, capture_output=True)
@@ -90,18 +96,13 @@ def _restore_database(wp_config_filename, db_dump_filename):
         exit(1)
 
     if completed.returncode != 0:
-        LOG.fatal('Database backup failed.\n\nmysqldump stdout:\n%s\n\nmysql '
-                  'stderr:\n%s',
+        LOG.fatal('Database restoration failed.\n\nmysqldump stdout:\n%s\n\n'
+                  'mysql stderr:\n%s',
                   completed.stdout,
                   completed.stderr)
         exit(2)
 
-    LOG.info('Saving database dump to "%s"...', db_dump_filename)
-
-    with open(db_dump_filename, 'wb') as stream:
-        stream.write(completed.stdout)
-
-    LOG.info('Database dump complete.')
+    LOG.info('Database restoration complete.')
 
 
 def backup(wp_directory, archive_filename):
@@ -151,13 +152,15 @@ def backup(wp_directory, archive_filename):
     LOG.info('Backup complete.')
 
 
-def restore(wp_directory, archive_filename):
+def restore(wp_directory, archive_filename, admin_credentials):
     """
     Performs a restoration.
 
     Args:
-        wp_directory (str):     Root WordPress directory.
-        archive_filename (str): Path and filename of tar gzip file to create.
+        wp_directory (str):              Root WordPress directory.
+        archive_filename (str):          Path and filename of tar gzip file to
+                                         create.
+        admin_credentials (Credentials): Database admin credentials.
 
     Raises:
         WpConfigNotFoundError:  wp-config.php was not found.
@@ -175,25 +178,12 @@ def restore(wp_directory, archive_filename):
     tmp_wp_dir_path = os.path.join(temp_dir.name, WP_DIR_ARCNAME)
     LOG.info('Will extract the WordPress content to: %s', tmp_wp_dir_path)
 
-    # wp_dir_root_path = os.path.join('..', wp_directory)
-    # wp_dir_actual_name = os.path.basename(wp_directory)
-
-    # LOG.info('Will extract the WordPress content to a directory named "%s" '
-    #          'in "%s".',
-    #          wp_dir_actual_name,
-    #          wp_dir_root_path)
-
     if os.path.exists(wp_directory):
         LOG.info('Removing existing WordPress content at "%s"...', wp_directory)
         shutil.rmtree(wp_directory)
 
     LOG.info('Opening archive: %s', archive_filename)
     with tarfile.open(archive_filename, 'r:gz') as stream:
-        LOG.info('Extracting database dump "%s" to "%s"...',
-                 DB_DUMP_ARCNAME,
-                 db_dump_path)
-        stream.extract(DB_DUMP_ARCNAME, path=db_dump_path)
-
         LOG.info('Extracting WordPress directory "%s" to "%s"...',
                  WP_DIR_ARCNAME,
                  wp_directory)
@@ -209,5 +199,18 @@ def restore(wp_directory, archive_filename):
                 wp_members.append(member)
 
         stream.extractall(members=wp_members, path=wp_directory)
+
+        LOG.info('Extracting database dump "%s" to "%s"...',
+                 DB_DUMP_ARCNAME,
+                 db_dump_path)
+        stream.extract(DB_DUMP_ARCNAME, path=db_dump_path)
+
+        wp_config_filename = os.path.join(wp_directory, 'wp-config.php')
+
+        _restore_database(
+            wp_config_filename=wp_config_filename,
+            db_dump_filename=db_dump_path,
+            admin_credentials=admin_credentials
+        )
 
     LOG.info('Restoration complete.')
