@@ -54,7 +54,7 @@ def run_from_cli():
                                  'Required only for restorations.',
                             required=False)
 
-    arg_parser.add_argument('--admin-credentials-aws-secret-region',
+    arg_parser.add_argument('--admin-credentials-aws-region',
                             help='Region in which the database admin '
                                  'credentials secret resides. Required only '
                                  'for restorations.',
@@ -92,7 +92,7 @@ def run_from_cli():
         if args.admin_credentials_aws_secret_id:
             admin_credentials = wpbackup.Credentials.from_aws_secrets_manager(
                 secret_id=args.admin_credentials_aws_secret_id,
-                region=args.admin_credentials_aws_secret_region
+                region=args.admin_credentials_aws_region
             )
         else:
             admin_credentials = wpbackup.Credentials.from_username_and_password(

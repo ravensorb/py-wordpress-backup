@@ -179,7 +179,8 @@ def restore(wp_directory, archive_filename, admin_credentials):
     LOG.info('Will extract the WordPress content to: %s', tmp_wp_dir_path)
 
     if os.path.exists(wp_directory):
-        LOG.info('Removing existing WordPress content at "%s"...', wp_directory)
+        LOG.info('Removing existing WordPress content at "%s"...',
+                 wp_directory)
         shutil.rmtree(wp_directory)
 
     LOG.info('Opening archive: %s', archive_filename)
