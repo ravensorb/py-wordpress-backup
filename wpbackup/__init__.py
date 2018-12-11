@@ -178,13 +178,16 @@ def restore(wp_directory, archive_filename, admin_credentials):
     tmp_wp_dir_path = os.path.join(temp_dir.name, WP_DIR_ARCNAME)
     LOG.info('Will extract the WordPress content to: %s', tmp_wp_dir_path)
 
-    new_wp_directory = wp_directory + '_new'
+    if os.path.exists(wp_directory):
+        LOG.info('Removing existing WordPress content at "%s"...',
+                 wp_directory)
+        shutil.rmtree(wp_directory)
 
     LOG.info('Opening archive: %s', archive_filename)
     with tarfile.open(archive_filename, 'r:gz') as stream:
         LOG.info('Extracting WordPress directory "%s" to "%s"...',
                  WP_DIR_ARCNAME,
-                 new_wp_directory)
+                 wp_directory)
 
         root_dir = WP_DIR_ARCNAME + os.path.sep
         root_dir_len = len(root_dir)
@@ -196,7 +199,7 @@ def restore(wp_directory, archive_filename, admin_credentials):
                 member.path = member.path[root_dir_len:]
                 wp_members.append(member)
 
-        stream.extractall(members=wp_members, path=new_wp_directory)
+        stream.extractall(members=wp_members, path=wp_directory)
 
         LOG.info('Extracting database dump "%s" to "%s"...',
                  DB_DUMP_ARCNAME,
@@ -210,15 +213,5 @@ def restore(wp_directory, archive_filename, admin_credentials):
             db_dump_filename=db_dump_path,
             admin_credentials=admin_credentials
         )
-
-    if os.path.exists(wp_directory):
-        LOG.info('Removing existing WordPress content at "%s"...',
-                 wp_directory)
-        shutil.rmtree(wp_directory)
-
-    LOG.info('Renaming "%s" to "%s"...',
-             new_wp_directory,
-             wp_directory)
-    os.rename(new_wp_directory, wp_directory)
 
     LOG.info('Restoration complete.')
