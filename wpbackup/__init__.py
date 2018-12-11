@@ -64,17 +64,6 @@ def _dump_database(wp_config_filename, db_dump_filename):
 def _restore_database(wp_config_filename, db_dump_filename, admin_credentials):
     wp_config = WpConfigFile(wp_config_filename)
 
-    # cmd_template = (
-    #     'CREATE DATABASE IF NOT EXISTS {db_name}; '
-    #     'use {db_name}; '
-    #     'source {db_dump};'
-    # )
-
-    # cmd = cmd_template.format(
-    #     db_name=wp_config.get('DB_NAME'),
-    #     db_dump=db_dump_filename
-    # )
-
     create_args = [
         'mysql',
         '--host',
@@ -93,16 +82,14 @@ def _restore_database(wp_config_filename, db_dump_filename, admin_credentials):
         '--user',
         admin_credentials.username,
         '-p' + admin_credentials.password,
-        wp_config.get('DB_NAME'),
-        '<',
-        db_dump_filename
+        wp_config.get('DB_NAME')
     ]
 
     try:
         LOG.info('Ensuring the database exists...')
         completed = subprocess.run(create_args, capture_output=True)
         LOG.info('Restoring from database dump...')
-        completed = subprocess.run(restore_args, capture_output=True)
+        completed = subprocess.run(restore_args, capture_output=True, input=db_dump_filename)
     except FileNotFoundError as error:
         LOG.fatal(error)
         LOG.fatal('mysqldump was not found. Please install it and try again.')
