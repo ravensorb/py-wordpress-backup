@@ -87,10 +87,13 @@ def _restore_database(wp_config_filename, db_dump_filename, admin_credentials):
         'source {};'.format(db_dump_filename)
     ]
 
+    LOG.info('Copying...')
+    shutil.copy(db_dump_filename, '/tmp/database.sql')
+
     try:
         LOG.info('Ensuring the database exists...')
         completed = subprocess.run(create_args, capture_output=True)
-        LOG.info('Restoring from database dump...')
+        LOG.info('Restoring database from "%s"...', db_dump_filename)
         completed = subprocess.run(restore_args, capture_output=True)
     except FileNotFoundError as error:
         LOG.fatal(error)
