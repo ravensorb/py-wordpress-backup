@@ -1,7 +1,5 @@
 # py-wordpress-backup
 
-[![CircleCI](https://circleci.com/gh/cariad/py-wordpress-backup/tree/master.svg?style=svg)](https://circleci.com/gh/cariad/py-wordpress-backup/tree/master)
-
 A Python package for backing up and restoring a self-hosted WordPress installation, including the database and uploaded content.
 
 The backup file will contain:
@@ -11,7 +9,8 @@ The backup file will contain:
 
 ## TODO
 
-[ ] Unit tests.
+ - Unit tests.
+ - Handle `wp-config.php` being somewhere other than the default location.
 
 ## Installation
 
@@ -55,16 +54,10 @@ python3 -m wpbackup --restore                        \
 
 ### Prerequisites
 
-wp-configr requires Python 3.x.
+py-wordpress-backup requires Python 3.x.
 
 ### Installing dependencies
 
 ```shell
 pip install -e .[dev]
-```
-
-### Running tests
-
-```shell
-python test.py
 ```

@@ -10,7 +10,7 @@ class WpConfigNotFoundError(Exception):
     """
 
     def __init__(self, wp_directory):
-        tmp = ('This version of wordpressbackup expects "wp-config.php" to '
+        tmp = ('This version of wpbackup expects "wp-config.php" to '
                'exist in the root of the WordPress directory ("{}").')
         msg = tmp.format(wp_directory)
         super().__init__(msg)
