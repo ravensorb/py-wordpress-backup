@@ -208,8 +208,8 @@ def restore(wp_directory, archive_filename, admin_credentials):
 
         LOG.info('Extracting database dump "%s" to "%s"...',
                  DB_DUMP_ARCNAME,
-                 db_dump_path)
-        stream.extract(DB_DUMP_ARCNAME, path=db_dump_path)
+                 temp_dir.name)
+        stream.extract(DB_DUMP_ARCNAME, path=temp_dir.name)
 
         wp_config_filename = os.path.join(wp_directory, 'wp-config.php')
 
