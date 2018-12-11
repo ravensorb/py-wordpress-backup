@@ -1,5 +1,5 @@
 """
-Update a wp-config.php file.
+Backup or restore WordPress content.
 """
 
 import argparse
@@ -8,7 +8,6 @@ import logging
 import chesney
 
 import wpbackup
-
 
 
 def run_from_cli():
@@ -20,7 +19,6 @@ def run_from_cli():
         description='Backup and restore all your self-hosted WordPress '
                     'content.',
         prog='python -m wordpressbackup')
-
 
     arg_parser.add_argument('--backup',
                             action='store_true',
@@ -88,21 +86,21 @@ def run_from_cli():
         wpbackup.backup(wp_directory=args.wp_dir,
                         archive_filename=args.archive)
     elif args.restore:
-
         if args.admin_credentials_aws_secret_id:
-            admin_credentials = wpbackup.Credentials.from_aws_secrets_manager(
+            credentials = wpbackup.Credentials.from_aws_secrets_manager(
                 secret_id=args.admin_credentials_aws_secret_id,
                 region=args.admin_credentials_aws_region
             )
         else:
-            admin_credentials = wpbackup.Credentials.from_username_and_password(
+            credentials = wpbackup.Credentials.from_username_and_password(
                 username=args.admin_username,
                 password=args.admin_password
             )
 
         wpbackup.restore(wp_directory=args.wp_dir,
                          archive_filename=args.archive,
-                         admin_credentials=admin_credentials)
+                         admin_credentials=credentials)
+
 
 if __name__ == '__main__':
     run_from_cli()

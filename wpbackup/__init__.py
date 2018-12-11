@@ -110,6 +110,9 @@ def _restore_database(wp_config_filename, db_dump_filename, admin_credentials):
     LOG.info('Database restoration complete.')
 
 
+
+
+
 def backup(wp_directory, archive_filename):
     """
     Performs a backup.
