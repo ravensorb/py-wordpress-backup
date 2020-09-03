@@ -1,15 +1,25 @@
 """
-"wpbackup" package setup.
+"wpbackup2" package setup.
 """
 
+import pathlib
 from setuptools import setup
 
-with open('README.md', 'r') as stream:
-    LONG_DESCRIPTION = stream.read()
+# The directory containing this file
+HERE = pathlib.Path(__file__).parent
+
+# The text of the README file
+README = (HERE / "README.md").read_text()
+
+# with open('README.md', 'r') as stream:
+#     LONG_DESCRIPTION = stream.read()
 
 setup(
-    author='Cariad Eccleston',
-    author_email='cariad@cariad.me',
+    author='Shawn Anderson',
+    author_email='code@eye-catcher.com',
+    long_description_content_type='text/markdown',
+    long_description=README,
+    description='Backup and restore all your self-hosted WordPress content',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
@@ -20,7 +30,6 @@ setup(
         'Operating System :: OS Independent',
         'Topic :: Internet :: WWW/HTTP :: Site Management'
     ],
-    description='Backup and restore all your self-hosted WordPress content.',
     extras_require={
         'dev': [
             'autopep8',
@@ -33,14 +42,11 @@ setup(
         'wpconfigr~=1.0',
         'wpdatabase~=1.0'
     ],
-    name='wpbackup',
-    license='MIT',
-    long_description=LONG_DESCRIPTION,
-    long_description_content_type='text/markdown',
+    name='wpbackup2',
+    license='MIT License',
     packages=[
-        'wpbackup',
-        'wpbackup.exceptions'
+        'wpbackup2'
     ],
-    url='https://github.com/cariad/py-wordpress-backup',
-    version='0.1'
+    url='https://github.com/ravensorb/py-wordpress-backup',
+    version='0.2.2'
 )

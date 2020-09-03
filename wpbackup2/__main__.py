@@ -2,13 +2,17 @@
 Backup or restore WordPress content.
 """
 
+# pylint: disable=line-too-long
+
 import argparse
 import logging
 
 import chesney
 
-import wpbackup
+from wpdatabase.classes import Credentials
 
+from wpbackup2.wpbackup import WpBackup
+from wpbackup2.wpsite import WpSite
 
 def run_from_cli():
     """
@@ -18,7 +22,7 @@ def run_from_cli():
     arg_parser = argparse.ArgumentParser(
         description='Backup and restore all your self-hosted WordPress '
                     'content.',
-        prog='python -m wordpressbackup')
+        prog='python -m wpbackup')
 
     arg_parser.add_argument('--backup',
                             action='store_true',
@@ -69,6 +73,34 @@ def run_from_cli():
                                  'this auto-scaling group performs the '
                                  'action.')
 
+    arg_parser.add_argument('--new-site-url',
+                            default=None,
+                            help='New Site Url')
+
+    arg_parser.add_argument('--new-site-host',
+                            default=None,
+                            help='New Site Host Name')
+
+    arg_parser.add_argument('--new-db-host',
+                            default=None,
+                            help='New Database Host')
+
+    arg_parser.add_argument('--new-db-port',
+                            default=None,
+                            help='New Database Port')
+
+    arg_parser.add_argument('--new-db-name',
+                            default=None,
+                            help='New Database Name')
+
+    arg_parser.add_argument('--new-db-user',
+                            default=None,
+                            help='New Database User Name')
+    
+    arg_parser.add_argument('--new-db-password',
+                            default=None,
+                            help='New Database User Password')
+
     args = arg_parser.parse_args()
 
     if args.backup == args.restore:
@@ -80,24 +112,36 @@ def run_from_cli():
     if args.only_appointed_in_asg:
         if not chesney.is_appointed():
             log.fatal('This EC2 instance is not appointed.')
-            exit(0)
+            return -1
+
+    wpsite = WpSite(siteHost=args.new_site_host if "new_site_host" in args else None,
+                    siteUrl=args.new_site_url  if "new_site_url" in args else None,
+                    sitePath=args.wp_dir,
+                    dbName=args.new_db_name if "new_db_name" in args else None,
+                    dbHost=args.new_db_host if "new_db_host" in args else None,
+                    dbPort=args.new_db_port if "new_db_port" in args else None,
+                    dbUser=args.new_db_user if "new_db_user" in args else None,
+                    dbPassword=args.new_db_password if "new_db_password" in args else None,
+                    )
+
+    wpbackup = WpBackup()
 
     if args.backup:
-        wpbackup.backup(wp_directory=args.wp_dir,
+        wpbackup.backup(wp_site=wpsite,
                         archive_filename=args.archive)
     elif args.restore:
         if args.admin_credentials_aws_secret_id:
-            credentials = wpbackup.Credentials.from_aws_secrets_manager(
+            credentials = Credentials.from_aws_secrets_manager(
                 secret_id=args.admin_credentials_aws_secret_id,
                 region=args.admin_credentials_aws_region
             )
         else:
-            credentials = wpbackup.Credentials.from_username_and_password(
+            credentials = Credentials.from_username_and_password(
                 username=args.admin_username,
                 password=args.admin_password
             )
 
-        wpbackup.restore(wp_directory=args.wp_dir,
+        wpbackup.restore(wp_site=wpsite,
                          archive_filename=args.archive,
                          admin_credentials=credentials)
 
