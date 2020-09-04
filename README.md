@@ -7,6 +7,16 @@ The backup file will contain:
  - Your database as a MySQL dump.
  - An exact copy of your entire WordPress directory.
 
+The restore process will:
+ - Extract the files into the correct location
+ - Update ``wp-config.php`` with new settings (if needed)
+ - Create the database if it doesn't exist
+ - Add the user and grant it access if it doesn't exist
+ - Restore the database
+
+## Credit
+Credit for the original version of this goes to [Cariad Eccleston](https://github.com/cariad/py-wordpress-database).  
+
 ## TODO
 
  - Unit tests.

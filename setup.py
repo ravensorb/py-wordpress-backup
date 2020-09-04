@@ -48,5 +48,5 @@ setup(
         'wpbackup2'
     ],
     url='https://github.com/ravensorb/py-wordpress-backup',
-    version='0.2.2'
+    version='0.2.4'
 )

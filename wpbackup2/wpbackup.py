@@ -9,6 +9,7 @@ import subprocess
 import tarfile
 import tempfile
 
+import wpdatabase
 from wpconfigr import WpConfigFile
 
 #from wpbackup2.exceptions import WpBackupNotFoundError
@@ -105,16 +106,17 @@ class WpBackup:
     def _restore_database(self, wp_config_filename, db_dump_filename, admin_credentials):
         wp_config = WpConfigFile(wp_config_filename)
 
-        create_args = [
-            'mysql',
-            '--host',
-            wp_config.get('DB_HOST'),
-            '--user',
-            admin_credentials.username,
-            '-p' + admin_credentials.password,
-            '--execute',
-            'CREATE DATABASE IF NOT EXISTS {};'.format(wp_config.get('DB_NAME'))
-        ]
+        LOG.info('Copying...')
+        shutil.copy(db_dump_filename, '/tmp/database.sql')
+
+        try:
+            LOG.info('Ensuring the database exists...')
+            wpdatabase.ensure(wp_config_filename=wp_config_filename,
+                        credentials=admin_credentials)
+        except FileNotFoundError as error:
+            LOG.exception(error)
+            LOG.fatal('mysql was not found. Please install it and try again.')
+            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None)
 
         restore_args = [
             'mysql',
@@ -127,25 +129,6 @@ class WpBackup:
             '--execute',
             'source {};'.format(db_dump_filename)
         ]
-
-        LOG.info('Copying...')
-        shutil.copy(db_dump_filename, '/tmp/database.sql')
-
-        try:
-            LOG.info('Ensuring the database exists...')
-            LOG.debug("CREATE CMD: %s", create_args)
-            completed = subprocess.run(create_args, capture_output=True)
-        except FileNotFoundError as error:
-            LOG.exception(error)
-            LOG.fatal('mysql was not found. Please install it and try again.')
-            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None)
-
-        if completed.returncode != 0:
-            LOG.fatal('Creating database failed.\n\nmysql stdout:\n%s\n\n'
-                      'mysql stderr:\n%s',
-                      completed.stdout,
-                      completed.stderr)
-            raise WpDatabaseRestoreFailed(db_dump_filename, completed.stdout, completed.stderr)
 
         try:
             LOG.info('Restoring database from "%s"...', db_dump_filename)

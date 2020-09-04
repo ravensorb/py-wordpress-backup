@@ -96,7 +96,7 @@ def run_from_cli():
     arg_parser.add_argument('--new-db-user',
                             default=None,
                             help='New Database User Name')
-    
+
     arg_parser.add_argument('--new-db-password',
                             default=None,
                             help='New Database User Password')
