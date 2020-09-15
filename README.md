@@ -41,16 +41,38 @@ Note that the current release of `py-wordpress-backup` expected `wp-config.php` 
 To restore using database admin credentials held in AWS Secrets Manager:
 
 ```shell
-python3 -m wpbackup2 --restore --wp-dir /www/wordpress --archive ~/backup.tar.gz --admin-credentials-aws-secret-id AdminUserSecretID --admin-credentials-aws-region eu-west-1
+python3 -m wpbackup2 
+        --restore 
+        --wp-dir /www/wordpress 
+        --archive ~/backup.tar.gz 
+        --admin-credentials-aws-secret-id AdminUserSecretID 
+        --admin-credentials-aws-region eu-west-1
 ```
 
 To restore with specified database admin credentials:
 
 ```shell
-python3 -m wpbackup2 --restore --wp-dir /www/wordpress --archive ~/backup.tar.gz --admin-user admin --admin-password trustno1 --new-site-url https://new.site.url --new-site-host https://new.site.url --new-db-host --new-db-port 3306 --new-db-name new-wordpress-db-name  
+python3 -m wpbackup2 
+        --restore 
+        --wp-dir /www/wordpress 
+        --archive ~/backup.tar.gz 
+        --admin-user admin 
+        --admin-password trustno1 
+        --new-site-url https://new.site.url 
+        --new-site-host https://new.site.url 
+        --new-db-host 
+        --new-db-port 3306 
+        --new-db-name new-wordpress-db-name  
 ```
 
 ## Development
+
+```python
+import wpbackup2
+
+wp = WpBackup()
+wpbackup('path to wordpress', 'archive name')
+```
 
 ### Prerequisites
 

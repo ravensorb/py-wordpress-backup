@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sudo rm -r build dist wpbackup2.egg-info
-
 #echo "-------------------------------------------------------------------------------------------"
 #echo "Incrementing Version..."
 #bumpversion --current-version 0.3.0 minor setup.py wpbackup2/__init__.py

@@ -9,7 +9,7 @@ import logging
 
 import chesney
 
-from wpdatabase.classes import Credentials
+from wpdatabase2.classes import WpCredentials
 
 from wpbackup2.wpbackup import WpBackup
 from wpbackup2.wpsite import WpSite
@@ -131,12 +131,12 @@ def run_from_cli():
                         archive_filename=args.archive)
     elif args.restore:
         if args.admin_credentials_aws_secret_id:
-            credentials = Credentials.from_aws_secrets_manager(
+            credentials = WpCredentials.from_aws_secrets_manager(
                 secret_id=args.admin_credentials_aws_secret_id,
                 region=args.admin_credentials_aws_region
             )
         else:
-            credentials = Credentials.from_username_and_password(
+            credentials = WpCredentials.from_username_and_password(
                 username=args.admin_username,
                 password=args.admin_password
             )

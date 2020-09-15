@@ -1,0 +1,6 @@
+{
+    "dbHost": "127.0.0.1",
+    "dbName": "wordpress",
+    "dbUser": "wordpress",
+    "dbPassword": "pass@word1"
+}
