@@ -11,8 +11,9 @@ import chesney
 
 from wpdatabase2.classes import WpCredentials
 
-from wpbackup2.wpbackup import WpBackup
-from wpbackup2.wpsite import WpSite
+from wpbackup2.classes.wpbackup import WpBackup
+from wpbackup2.classes.wpsite import WpSite
+from wpbackup2.__version__ import __version__
 
 def run_from_cli():
     """
@@ -23,6 +24,9 @@ def run_from_cli():
         description='Backup and restore all your self-hosted WordPress '
                     'content.',
         prog='python -m wpbackup')
+
+    arg_parser.add_argument('--version', action='version',
+                    version='%(prog)s {version}'.format(version=__version__))
 
     arg_parser.add_argument('--backup',
                             action='store_true',
