@@ -40,13 +40,15 @@ setup(
     install_requires=[
         'chesney~=1.0',
         'wpconfigr~=1.0',
-        'wpdatabase2~=0.0.2'
+        'wpdatabase2>=0.0.3,<=1.0.0'
     ],
     name='wpbackup2',
     license='MIT License',
     packages=[
-        'wpbackup2'
+        'wpbackup2',
+        'wpbackup2.classes',
+        'wpbackup2.exceptions'
     ],
     url='https://github.com/ravensorb/py-wordpress-backup',
-    version='0.2.6'
+    version='0.2.7'
 )
