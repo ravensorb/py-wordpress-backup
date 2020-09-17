@@ -39,16 +39,17 @@ class WpSite(WpConnection):
 
         self.site_path = site_path
 
-        self.log.debug("SiteHome='%s', SiteUrl='%s', SitePath='%s', DatabaseName='%s', Database Host='%s', Database  Port='%s', Datebase User='%s', Database Password='%s'", # pylint: disable=line-too-long
-                  self.site_home,
-                  self.site_url,
-                  self.site_path,
-                  self.db_name,
-                  self.db_host,
-                  self.db_port,
-                  self.credentials.username,
-                  self.credentials.password
-                  )
+        try:
+            self.log.debug("SiteHome='%s', SiteUrl='%s', SitePath='%s', DatabaseName='%s', Database Host='%s', Database  Port='%s'", # pylint: disable=line-too-long
+                           self.site_home,
+                           self.site_url,
+                           self.site_path,
+                           self.db_name,
+                           self.db_host,
+                           self.db_port
+                           )
+        except Exception: # pylint: disable=broad-except
+            pass
 
     ###########################################################################
     @classmethod

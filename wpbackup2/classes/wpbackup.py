@@ -61,14 +61,14 @@ class WpBackup:
             wp_config.set('WP_HOME', wp_site.site_home)
 
         self._log.debug(" Site Host='%s', Site Url='%s', Site Path='%s', Database Name='%s', Database Host='%s', Database User='%s', Database Password='%s'", # pylint: disable=line-too-long
-                  wp_config.get('WP_HOME'),
-                  wp_config.get('WP_SITEURL'),
-                  wp_site.site_path,
-                  wp_config.get('DB_NAME'),
-                  wp_config.get('DB_HOST'),
-                  wp_config.get('DB_USER'),
-                  wp_config.get('DB_PASSWORD')
-                  )
+                        wp_config.get('WP_HOME'),
+                        wp_config.get('WP_SITEURL'),
+                        wp_site.site_path,
+                        wp_config.get('DB_NAME'),
+                        wp_config.get('DB_HOST'),
+                        wp_config.get('DB_USER'),
+                        wp_config.get('DB_PASSWORD')
+                        )
 
     #########################################################################
     def _dump_database(self, wp_config_filename):
@@ -96,13 +96,13 @@ class WpBackup:
         except FileNotFoundError as error:
             self._log.exception(error)
             self._log.fatal('mysqldump was not found. Please install it and try again.')
-            raise WpDatabaseMysqlFailed(message="mysqldump was not found", stdOut=None, stdError=None) # pylint: disable=raise-missing-from
+            raise WpDatabaseMysqlFailed(message="mysqldump was not found", stdOut=None, stdError=None)
 
         if completed.returncode != 0:
             self._log.fatal('Database backup failed.\n\nmysqldump stdout:\n%s\n\nmysql '
-                      'stderr:\n%s',
-                      completed.stdout,
-                      completed.stderr)
+                            'stderr:\n%s',
+                            completed.stdout,
+                            completed.stderr)
             raise WpDatabaseBackupFailed(fileName=db_dump_filename, stdOut=completed.stdout, stdError=completed.stderr)
 
         self._log.info('Saving database dump to "%s"...', db_dump_filename)
@@ -124,17 +124,17 @@ class WpBackup:
         self._log.info('Creating archive: %s', archive_filename)
         with tarfile.open(archive_filename, 'w:gz') as stream:
             self._log.info('Adding database dump "%s" to archive "%s" with arcname '
-                     '"%s"...',
-                     db_dump_filename,
-                     archive_filename,
-                     DB_DUMP_ARCNAME)
+                           '"%s"...',
+                           db_dump_filename,
+                           archive_filename,
+                           DB_DUMP_ARCNAME)
             stream.add(db_dump_filename, arcname=DB_DUMP_ARCNAME)
 
             self._log.info('Adding WordPress directory "%s" to archive "%s" with '
-                     'arcname "%s"...',
-                     wp_site.site_path,
-                     archive_filename,
-                     WP_DIR_ARCNAME)
+                           'arcname "%s"...',
+                           wp_site.site_path,
+                           archive_filename,
+                           WP_DIR_ARCNAME)
             stream.add(wp_site.site_path, arcname=WP_DIR_ARCNAME)
 
     #########################################################################
@@ -146,11 +146,11 @@ class WpBackup:
         try:
             self._log.info('Ensuring the database exists...')
             wpdatabase2.ensure(wp_config_filename=wp_site.wp_config_filename,
-                        credentials=admin_credentials)
+                               credentials=admin_credentials)
         except FileNotFoundError as error:
             self._log.exception(error)
             self._log.fatal('mysql was not found. Please install it and try again.')
-            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None) # pylint: disable=raise-missing-from
+            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None)
 
         restore_args = [
             'mysql',
@@ -171,13 +171,13 @@ class WpBackup:
         except FileNotFoundError as error:
             self._log.exception(error)
             self._log.fatal('mysql was not found. Please install it and try again.')
-            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None) # pylint: disable=raise-missing-from
+            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None)
 
         if completed.returncode != 0:
             self._log.fatal('Database restoration failed.\n\nmysql stdout:\n%s\n\n'
-                      'mysql stderr:\n%s',
-                      completed.stdout,
-                      completed.stderr)
+                            'mysql stderr:\n%s',
+                            completed.stdout,
+                            completed.stderr)
             raise WpDatabaseRestoreFailed(db_dump_filename, completed.stdout, completed.stderr)
 
         self._log.info('Database restoration complete.')
@@ -188,14 +188,14 @@ class WpBackup:
 
         if os.path.exists(wp_site.site_path):
             self._log.info('Removing existing WordPress content at "%s"...',
-                     wp_site.site_path)
+                           wp_site.site_path)
             shutil.rmtree(wp_site.site_path, ignore_errors=True)
 
         self._log.info('Opening archive: %s', archive_filename)
         with tarfile.open(archive_filename, 'r:gz') as stream:
             self._log.info('Extracting WordPress directory "%s" to "%s"...',
-                     WP_DIR_ARCNAME,
-                     wp_site.site_path)
+                           WP_DIR_ARCNAME,
+                           wp_site.site_path)
 
             root_dir = WP_DIR_ARCNAME + os.path.sep
             root_dir_len = len(root_dir)
@@ -211,8 +211,8 @@ class WpBackup:
             stream.extractall(members=wp_members, path=wp_site.site_path)
 
             self._log.info('Extracting database dump "%s" to "%s"...',
-                     DB_DUMP_ARCNAME,
-                     self._temp_dir.name)
+                           DB_DUMP_ARCNAME,
+                           self._temp_dir.name)
             stream.extract(DB_DUMP_ARCNAME, path=self._temp_dir.name)
 
         self._log.info('Updating database information in config file.')
