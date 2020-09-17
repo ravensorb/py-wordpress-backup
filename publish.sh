@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$1" == "test" ]; then
-    twine upload --verbose --repository-url https://test.pypi.org/legacy/ dist/*
+    python3 -m twine upload --verbose --repository testpypi dist/*
 else
-    twine upload --verbose dist/*
+    python3 -m twine upload --verbose dist/*
 fi

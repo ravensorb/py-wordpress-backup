@@ -7,7 +7,7 @@ rm -f dist/*
 if [ "$1" == "bump" ]; then
     echo "-------------------------------------------------------------------------------------------"
     echo "Incrementing Version..."
-    bumpversion --list patch
+    python3 -m bumversion --list patch
 fi
 
 echo "-------------------------------------------------------------------------------------------"
@@ -17,7 +17,7 @@ python3 setup.py sdist bdist_wheel
 
 echo "-------------------------------------------------------------------------------------------"
 echo "Validating"
-twine check dist/*
+python3 -m twine check dist/*
 retVal=$?
 if [ $retVal -ne 0 ]; then
     echo "Error in package. Please fix and try again..."

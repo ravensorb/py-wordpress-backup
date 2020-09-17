@@ -81,17 +81,13 @@ def run_from_cli():
                             default=None,
                             help='New Site Url')
 
-    arg_parser.add_argument('--new-site-host',
+    arg_parser.add_argument('--new-site-home-url',
                             default=None,
-                            help='New Site Host Name')
+                            help='New Site Home Url')
 
     arg_parser.add_argument('--new-db-host',
                             default=None,
                             help='New Database Host')
-
-    arg_parser.add_argument('--new-db-port',
-                            default=None,
-                            help='New Database Port')
 
     arg_parser.add_argument('--new-db-name',
                             default=None,
@@ -118,14 +114,12 @@ def run_from_cli():
             log.fatal('This EC2 instance is not appointed.')
             return -1
 
-    wpsite = WpSite(siteHost=args.new_site_host if "new_site_host" in args else None,
-                    siteUrl=args.new_site_url  if "new_site_url" in args else None,
-                    sitePath=args.wp_dir,
-                    dbName=args.new_db_name if "new_db_name" in args else None,
-                    dbHost=args.new_db_host if "new_db_host" in args else None,
-                    dbPort=args.new_db_port if "new_db_port" in args else None,
-                    dbUser=args.new_db_user if "new_db_user" in args else None,
-                    dbPassword=args.new_db_password if "new_db_password" in args else None,
+    wpsite = WpSite(site_home=args.new_site_home_url if "new_site_host" in args else None,
+                    site_url=args.new_site_url  if "new_site_url" in args else None,
+                    site_path=args.wp_dir,
+                    db_host=args.new_db_host if "new_db_host" in args else None,
+                    db_name=args.new_db_name if "new_db_name" in args else None,
+                    credentials=WpCredentials.from_username_and_password(args.new_db_user if "new_db_user" in args else None, args.new_db_password if "new_db_password" in args else None)
                     )
 
     wpbackup = WpBackup()

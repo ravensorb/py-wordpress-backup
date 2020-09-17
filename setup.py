@@ -38,8 +38,8 @@ setup(
         ]
     },
     install_requires=[
-        'chesney~=1.0',
-        'wpconfigr~=1.0',
+        'chesney>=1.0,<=2.0',
+        'wpconfigr>=1.0.0,<=2.0.0',
         'wpdatabase2>=0.0.3,<=1.0.0'
     ],
     name='wpbackup2',
@@ -50,5 +50,5 @@ setup(
         'wpbackup2.exceptions'
     ],
     url='https://github.com/ravensorb/py-wordpress-backup',
-    version='0.2.8'
+    version='0.2.9'
 )
