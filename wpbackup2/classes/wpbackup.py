@@ -48,11 +48,12 @@ class WpBackup:
         if (wp_site.db_name is not None and len(wp_site.db_name) > 0):
             wp_config.set('DB_NAME', wp_site.db_name)
 
-        if (wp_site.credentials.username is not None and len(wp_site.credentials.username) > 0):
-            wp_config.set('DB_USER', wp_site.credentials.username)
+        if (wp_site.credentials is not None):
+            if (wp_site.credentials.username is not None and len(wp_site.credentials.username) > 0):
+                wp_config.set('DB_USER', wp_site.credentials.username)
 
-        if (wp_site.credentials.password is not None and len(wp_site.credentials.password) > 0):
-            wp_config.set('DB_PASSWORD', wp_site.credentials.password)
+            if (wp_site.credentials.password is not None and len(wp_site.credentials.password) > 0):
+                wp_config.set('DB_PASSWORD', wp_site.credentials.password)
 
         if (wp_site.site_url is not None and len(wp_site.site_url) > 0):
             wp_config.set('WP_SITEURL', wp_site.site_url)
@@ -216,6 +217,19 @@ class WpBackup:
             stream.extract(DB_DUMP_ARCNAME, path=self._temp_dir.name)
 
         self._log.info('Updating database information in config file.')
+
+        # wp_site_old = WpSite.from_wp_config_file_name(wp_site.wp_config_filename)
+
+        # if (wp_site.site_home is None):
+        #     wp_site.site_home = wp_site_old.site_home
+        # if (wp_site.site_url is None):
+        #     wp_site.site_url = wp_site_old.site_url
+        # if (wp_site.db_host is None):
+        #     wp_site.db_host = wp_site_old.db_host
+        # if (wp_site.db_name is None):
+        #     wp_site.db_name = wp_site_old.db_name
+        # if (wp_site.credentials is None):
+        #     wp_site.credentials = wp_site_old.credentials
 
         self._update_config(wp_site, wp_site.wp_config_filename)
 
