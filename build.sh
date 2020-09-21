@@ -7,7 +7,7 @@ rm -f dist/*
 if [ "$1" == "bump" ]; then
     echo "-------------------------------------------------------------------------------------------"
     echo "Incrementing Version..."
-    python3 -m bumversion --list patch
+    python3 -m bumpversion --list patch
 fi
 
 echo "-------------------------------------------------------------------------------------------"
