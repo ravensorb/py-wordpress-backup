@@ -139,19 +139,23 @@ class WpBackup:
             stream.add(wp_site.site_path, arcname=WP_DIR_ARCNAME)
 
     #########################################################################
-    def _restore_database(self, wp_site, admin_credentials):
+    def _restore_database(self, wp_site, admin_credentials, force=False):
         wp_config = WpConfigFile(wp_site.wp_config_filename)
 
-        db_dump_filename = os.path.join(self._temp_dir.name, DB_DUMP_ARCNAME)
-
         try:
+            wpdb = wpdatabase2.WpDatabase(wp_config=wp_config)
+            if wpdb.does_database_exist() and not force:
+                self._log.info('Existing Database found. Skipping database restore')
+                return
+
             self._log.info('Ensuring the database exists...')
-            wpdatabase2.ensure(wp_config_filename=wp_site.wp_config_filename,
-                               credentials=admin_credentials)
+            wpdb.ensure_database_setup(admin_credentials=admin_credentials)
         except FileNotFoundError as error:
             self._log.exception(error)
             self._log.fatal('mysql was not found. Please install it and try again.')
             raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None)
+
+        db_dump_filename = os.path.join(self._temp_dir.name, DB_DUMP_ARCNAME)
 
         restore_args = [
             'mysql',
@@ -218,19 +222,6 @@ class WpBackup:
 
         self._log.info('Updating database information in config file.')
 
-        # wp_site_old = WpSite.from_wp_config_file_name(wp_site.wp_config_filename)
-
-        # if (wp_site.site_home is None):
-        #     wp_site.site_home = wp_site_old.site_home
-        # if (wp_site.site_url is None):
-        #     wp_site.site_url = wp_site_old.site_url
-        # if (wp_site.db_host is None):
-        #     wp_site.db_host = wp_site_old.db_host
-        # if (wp_site.db_name is None):
-        #     wp_site.db_name = wp_site_old.db_name
-        # if (wp_site.credentials is None):
-        #     wp_site.credentials = wp_site_old.credentials
-
         self._update_config(wp_site, wp_site.wp_config_filename)
 
         self._log.info('File restore complete...')
@@ -257,7 +248,7 @@ class WpBackup:
         self._log.info('Backup complete.')
 
     #########################################################################
-    def restore(self, wp_site, archive_filename, admin_credentials):
+    def restore(self, wp_site, archive_filename, admin_credentials, force=False):
         """
         Performs a restoration.
 
@@ -280,7 +271,8 @@ class WpBackup:
 
         self._restore_database(
             wp_site=wp_site,
-            admin_credentials=admin_credentials
+            admin_credentials=admin_credentials,
+            force=force
         )
 
         self._log.info('Restoration complete.')

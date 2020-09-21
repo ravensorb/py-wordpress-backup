@@ -79,27 +79,38 @@ def run_from_cli():
 
     arg_parser.add_argument('--new-site-url',
                             default=None,
-                            help='New Site Url')
+                            help='New Site Url',
+                            required=False)
 
     arg_parser.add_argument('--new-site-home-url',
                             default=None,
-                            help='New Site Home Url')
+                            help='New Site Home Url',
+                            required=False)
 
     arg_parser.add_argument('--new-db-host',
                             default=None,
-                            help='New Database Host')
+                            help='New Database Host',
+                            required=False)
 
     arg_parser.add_argument('--new-db-name',
                             default=None,
-                            help='New Database Name')
+                            help='New Database Name',
+                            required=False)
 
     arg_parser.add_argument('--new-db-user',
                             default=None,
-                            help='New Database User Name')
+                            help='New Database User Name',
+                            required=False)
 
     arg_parser.add_argument('--new-db-password',
                             default=None,
-                            help='New Database User Password')
+                            help='New Database User Password',
+                            required=False)
+
+    arg_parser.add_argument('--force',
+                            action='store_true',
+                            help='Force restore even if already exists',
+                            required=False)
 
     args = arg_parser.parse_args()
 
