@@ -152,7 +152,8 @@ def run_from_cli():
 
         wpbackup.restore(wp_site=wpsite,
                          archive_filename=args.archive,
-                         admin_credentials=credentials)
+                         admin_credentials=credentials,
+                         Force=True if args.force else False)
 
 
 if __name__ == '__main__':
