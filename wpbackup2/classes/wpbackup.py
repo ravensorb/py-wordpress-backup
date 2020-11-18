@@ -9,6 +9,7 @@ import subprocess
 import tarfile
 import tempfile
 
+from enum import Enum
 from wpconfigr import WpConfigFile
 
 import wpdatabase2
@@ -48,7 +49,7 @@ class WpBackup:
         if (wp_site.db_name is not None and len(wp_site.db_name) > 0):
             wp_config.set('DB_NAME', wp_site.db_name)
 
-        if (wp_site.credentials is not None):
+        if wp_site.credentials is not None:
             if (wp_site.credentials.username is not None and len(wp_site.credentials.username) > 0):
                 wp_config.set('DB_USER', wp_site.credentials.username)
 
@@ -97,7 +98,7 @@ class WpBackup:
         except FileNotFoundError as error:
             self._log.exception(error)
             self._log.fatal('mysqldump was not found. Please install it and try again.')
-            raise WpDatabaseMysqlFailed(message="mysqldump was not found", stdOut=None, stdError=None)
+            raise WpDatabaseMysqlFailed(message="mysqldump was not found", stdOut=None, stdError=None) from error
 
         if completed.returncode != 0:
             self._log.fatal('Database backup failed.\n\nmysqldump stdout:\n%s\n\nmysql '
@@ -144,16 +145,17 @@ class WpBackup:
 
         try:
             wpdb = wpdatabase2.WpDatabase(wp_config=wp_config)
-            if wpdb.does_database_exist() and not force:
-                self._log.info('Existing Database found. Skipping database restore')
-                return
+            if not force:
+                if wpdb.does_database_exist():
+                    self._log.info('Existing Database found. Skipping database restore')
+                    return
 
             self._log.info('Ensuring the database exists...')
-            wpdb.ensure_database_setup(admin_credentials=admin_credentials)
+            wpdb.ensure_database_setup(admin_credentials=admin_credentials, force=force)
         except FileNotFoundError as error:
             self._log.exception(error)
             self._log.fatal('mysql was not found. Please install it and try again.')
-            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None)
+            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None) from error
 
         db_dump_filename = os.path.join(self._temp_dir.name, DB_DUMP_ARCNAME)
 
@@ -176,7 +178,7 @@ class WpBackup:
         except FileNotFoundError as error:
             self._log.exception(error)
             self._log.fatal('mysql was not found. Please install it and try again.')
-            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None)
+            raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None) from error
 
         if completed.returncode != 0:
             self._log.fatal('Database restoration failed.\n\nmysql stdout:\n%s\n\n'
@@ -188,10 +190,10 @@ class WpBackup:
         self._log.info('Database restoration complete.')
 
     #########################################################################
-    def _restore_files(self, wp_site, archive_filename):
+    def _restore_files(self, wp_site, archive_filename, remove_existing = True):
         self._log.info('Will restore the archive content to: %s', wp_site.site_path)
 
-        if os.path.exists(wp_site.site_path):
+        if os.path.exists(wp_site.site_path) and remove_existing:
             self._log.info('Removing existing WordPress content at "%s"...',
                            wp_site.site_path)
             shutil.rmtree(wp_site.site_path, ignore_errors=True)
@@ -241,6 +243,10 @@ class WpBackup:
 
         self._log.info('Starting backup.')
 
+        if archive_filename is None or len(archive_filename) == 0:
+            import datetime
+            archive_filename = "wpbackup2-{}-{}.tar.gz".format(wp_site.db_name, datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+
         self._dump_database(wp_config_filename=wp_site.wp_config_filename)
 
         self._backup_files(wp_site, archive_filename)
@@ -265,6 +271,9 @@ class WpBackup:
         if not isinstance(wp_site, WpSite):
             raise InvalidArgumentsError("wp_site might be an instance of WpSite")
 
+        if archive_filename is None or len(archive_filename) == 0:
+            raise InvalidArgumentsError("archive name was not specified")
+
         self._log.info('Starting restoration.')
 
         self._restore_files(wp_site=wp_site, archive_filename=archive_filename)
@@ -276,3 +285,10 @@ class WpBackup:
         )
 
         self._log.info('Restoration complete.')
+
+class RestoreMode(Enum):
+    '''
+    Enum for restore methods
+    '''
+    CleanFirst = 1
+    OverwriteExisting = 2

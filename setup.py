@@ -40,7 +40,7 @@ setup(
     install_requires=[
         'chesney>=1.0,<=2.0',
         'wpconfigr>=1.0.0,<=2.0.0',
-        'wpdatabase2>=0.0.12,<=1.0.0'
+        'wpdatabase2>=0.0.13'
     ],
     name='wpbackup2',
     license='MIT License',
