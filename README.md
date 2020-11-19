@@ -33,7 +33,7 @@ pip install wpbackup2
 To backup:
 
 ```
-python3 -m wpbackup2 --backup --wp-dir  /www/wordpress --archive ~/backup.tar.gz
+python3 -m wpbackup2 backup --wp-dir /www/wordpress --archive ~/backup.tar.gz
 ```
 
 Note that the current release of `py-wordpress-backup` expected `wp-config.php` to exist within your WordPress directory, and will use it to read your database credentials to perform the backup. Keeping your `wp-config.php` file in this location *might* not be the best practice, and I'll likely handle this in a future update.
@@ -42,7 +42,7 @@ To restore using database admin credentials held in AWS Secrets Manager:
 
 ```shell
 python3 -m wpbackup2 
-        --restore 
+        restore 
         --wp-dir /www/wordpress 
         --archive ~/backup.tar.gz 
         --admin-credentials-aws-secret-id AdminUserSecretID 
@@ -53,7 +53,7 @@ To restore with specified database admin credentials:
 
 ```shell
 python3 -m wpbackup2 
-        --restore 
+        restore 
         --wp-dir /www/wordpress 
         --archive ~/backup.tar.gz 
         --admin-user admin 

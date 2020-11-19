@@ -28,9 +28,9 @@ class WpSiteTestCase(unittest.TestCase):
         self.assertEqual(instance.credentials.username, 'username')
         self.assertEqual(instance.credentials.password, 'password')
 
-    def test_wpsite_from_wp_config_file_name(self):
+    def test_wpsite_from_wp_path(self):
         """ Test WpSite constructor """
-        instance = WpSite.from_wp_config_file_name('tests/data/wp-config.php')
+        instance = WpSite.from_wp_path('tests/data/wp-config.php')
 
         self.assertTrue(isinstance(instance, WpSite))
         self.assertEqual(instance.db_name, 'wordpress')

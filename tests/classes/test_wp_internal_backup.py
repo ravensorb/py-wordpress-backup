@@ -1,4 +1,6 @@
-""" Tests for the WpBackup class. """
+""" Tests for the WpInternalBackup class. """
+
+# pylint: disable=line-too-long
 
 import unittest
 import shutil
@@ -9,15 +11,15 @@ import logging
 import tempfile
 
 from wpbackup2 import WpSite
-from wpbackup2 import WpBackup
+from wpbackup2.classes.wp_internal_backup import WpInternalBackup
 
 LOG = logging.getLogger(__name__)
 
-class WpBackupTestCase(unittest.TestCase):
+class WpInternalBackupTestCase(unittest.TestCase):
     """ Tests for the WpSite class. """
     _wp_site = None
     _temp_dir = tempfile.TemporaryDirectory(prefix='test_wpbackup_')
-    _what_if = True
+    _what_if = False
 
     #########################################################################
     def __del__(self):
@@ -51,25 +53,15 @@ class WpBackupTestCase(unittest.TestCase):
         LOG.debug('Cleaning  up test data')
         #shutil.rmtree(self._wp_site.site_path)
 
-    #########################################################################
     def test_wpbackup_backup(self):
         """ Test WpBackup backup  """
         self._setup_test_data()
 
-        instance = WpBackup(self._what_if)
-        instance.backup(self._wp_site, "somerandomname.tar.gz")
+        instance = WpInternalBackup(self._wp_site, self._temp_dir.name, self._what_if)
 
-        self._cleanup_test_data()
+        #instance.backup(self._wp_site, '/tmp/wp-backup-test.tar.gz')
 
-    #########################################################################
-    def test_wpbackup_restore(self):
-        """ Test WpBackup restore  """
-
-        self._setup_test_data()
-
-        instance = WpBackup(self._what_if)
-        instance.restore(self._wp_site, "somerandomname.tar.gz")
-
+        #instance.backup(site, "test_backup.tar.gz")
         self._cleanup_test_data()
 
 if __name__ == '__main__':
