@@ -39,6 +39,10 @@ def run_from_cli():
                             default='CRITICAL',
                             help='Log level',
                             required=False)
+    arg_parser.add_argument('--whatIf',
+                            action='store_true',
+                            dest='what_if',
+                            help='Execute in "what if" mode (no changes actually made)')
 
     # Setup the subparsers container
     subparsers = arg_parser.add_subparsers(help='Action being requested', dest='action')
@@ -59,11 +63,6 @@ def run_from_cli():
                                  'to backup to/restore from.',
                             default=None,
                             required=False)
-    shared_parser.add_argument('--whatIf',
-                            action='store_true',
-                            dest='what_if',
-                            default=False,
-                            help='Execute in "what if" mode (no changes actually made)')
 
     # Setup the individual sub parers
     backup_parser = subparsers.add_parser("backup", parents=[shared_parser],
