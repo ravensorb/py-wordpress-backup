@@ -116,7 +116,7 @@ class WpInternalRestore:
                     if not self.__what_if:
                         shutil.rmtree(self.__wp_site.site_path, ignore_errors=True)
 
-                self.__log.info("Restoring Wordpress Files stored in '%s' to '%s'", self.__wp_site.wp_dir, archive_filename)
+                self.__log.info("Restoring Wordpress Files stored in '%s' to '%s'", self.__wp_site.site_path, archive_filename)
                 self.__log.info('Extracting WordPress directory "%s" to "%s"...',
                             WP_DIR_ARCNAME,
                             self.__wp_site.site_path)
@@ -154,8 +154,10 @@ class WpInternalRestore:
 
         self.__log.info("Restore Wordpress Database to '%s'", self.__wp_site.db_server)
 
+        wp_config = WpConfigFile(self.__wp_site.wp_config_filename)
+
         try:
-            wpdb = wpdatabase2.WpDatabase(wp_config=self.__wp_config)
+            wpdb = wpdatabase2.WpDatabase(wp_config=wp_config)
             if WpRestoreMode.DELETEDATABASEBEFORERESTORE in restore_mode and not self.__what_if:
                 if wpdb.does_database_exist():
                     self.__log.info('Existing Database found. Skipping database restore')
