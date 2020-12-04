@@ -21,11 +21,11 @@ class WpBackup:
     __temp_dir = None
 
     #########################################################################
-    def __init__(self, what_if=False):
+    def __init__(self, what_if=False, temp_dir=None):
         self.__log = logging.getLogger(__name__)
 
         self.__what_if = what_if
-        self.__temp_dir = tempfile.TemporaryDirectory()
+        self.__temp_dir = temp_dir if not temp_dir is None else tempfile.TemporaryDirectory()
 
     #########################################################################
     def __del__(self):
