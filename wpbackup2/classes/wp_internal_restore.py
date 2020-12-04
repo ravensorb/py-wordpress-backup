@@ -166,13 +166,19 @@ class WpInternalRestore:
             self.__log.info('Ensuring the database exists...')
             if not self.__what_if:
                 wpdb.ensure_database_setup(admin_credentials=self.__wp_site.admin_credentials, force=WpRestoreMode.DATABASE in restore_mode)
-        except FileNotFoundError as error:
+        except Exception as error:
             self.__log.exception(error)
             self.__log.fatal('mysql was not found. Please install it and try again.')
 
             raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None) from error
 
         db_dump_filename = os.path.join(self.__temp_path, DB_DUMP_ARCNAME)
+
+        if not os.path.exists(db_dump_filename):
+            self.__log.info('Failed to extract database.sql from the backup.  Possible corrupt backup.')
+            raise WpDatabaseRestoreFailed(db_dump_filename, None, None)
+        else:
+            self.__log.info("Restoring Database from '%s'", db_dump_filename)
 
         restore_args = [
             'mysql',
