@@ -152,7 +152,7 @@ class WpInternalRestore:
         Restore Wordpress Database
         """
 
-        self.__log.info("Restore Wordpress Database to '%s'", self.__wp_site.db_server)
+        self.__log.info("Restore Wordpress Database to '%s'", self.__wp_site.db_host)
 
         wp_config = WpConfigFile(self.__wp_site.wp_config_filename)
 
