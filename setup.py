@@ -50,5 +50,5 @@ setup(
         'wpbackup2.exceptions'
     ],
     url='https://github.com/ravensorb/py-wordpress-backup',
-    version='0.2.18'
+    version='0.2.19'
 )
