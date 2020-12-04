@@ -181,11 +181,11 @@ class WpInternalRestore:
         restore_args = [
             'mysql',
             '--host',
-            self.__wp_site.db_host,
+            wp_config.get('DB_HOST'),
             '--user',
             self.__wp_site.admin_credentials.username,
             '-p' + self.__wp_site.admin_credentials.password,
-            self.__wp_site.db_name,
+            wp_config.get('DB_NAME'),
             '--execute',
             'source {};'.format(db_dump_filename)
         ]

@@ -19,11 +19,11 @@ class WpBackup:
     __temp_path = "/tmp"
 
     #########################################################################
-    def __init__(self, what_if=False, temp_dir=None):
+    def __init__(self, what_if=False, temp_path=None):
         self.__log = logging.getLogger(__name__)
 
         self.__what_if = what_if
-        self.__temp_path = temp_dir if not temp_dir is None else "/tmp"
+        self.__temp_path = temp_path if not temp_path is None else "/tmp"
 
     #########################################################################
     def backup(self, wp_site, archive_filename, backup_mode=WpBackupMode.ALL):
