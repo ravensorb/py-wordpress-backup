@@ -43,7 +43,6 @@ class WpInternalRestore:
     """ WpInternalRestore """
 
     __wp_site = None
-    __wp_config = None
     __temp_path = None
     __what_if = False
 
@@ -59,7 +58,6 @@ class WpInternalRestore:
             raise TypeError("wp_site must be an instance of WpSite")
 
         self.__wp_site = wp_site
-        self.__wp_config = WpConfigFile(self.__wp_site.wp_config_filename)
 
         if temp_path is None or len(temp_path) == 0:
             raise ValueError("temp_path must be specified")
@@ -70,34 +68,36 @@ class WpInternalRestore:
     def __update_config(self):
         self.__log.info("Updating wp_config.php file...")
 
+        wp_config = WpConfigFile(self.__wp_site.wp_config_filename)
+
         if not self.__what_if:
             if (self.__wp_site.db_host is not None and len(self.__wp_site.db_host) > 0):
-                self.__wp_config.set('DB_HOST', "{}{}".format(self.__wp_site.db_host, ":{}".format(self.__wp_site.db_port) if (self.__wp_site.db_port is not None) else ""))
+                wp_config.set('DB_HOST', "{}{}".format(self.__wp_site.db_host, ":{}".format(self.__wp_site.db_port) if (self.__wp_site.db_port is not None) else ""))
 
             if (self.__wp_site.db_name is not None and len(self.__wp_site.db_name) > 0):
-                self.__wp_config.set('DB_NAME', self.__wp_site.db_name)
+                wp_config.set('DB_NAME', self.__wp_site.db_name)
 
             if self.__wp_site.credentials is not None:
                 if (self.__wp_site.credentials.username is not None and len(self.__wp_site.credentials.username) > 0):
-                    self.__wp_config.set('DB_USER', self.__wp_site.credentials.username)
+                    wp_config.set('DB_USER', self.__wp_site.credentials.username)
 
                 if (self.__wp_site.credentials.password is not None and len(self.__wp_site.credentials.password) > 0):
-                    self.__wp_config.set('DB_PASSWORD', self.__wp_site.credentials.password)
+                    wp_config.set('DB_PASSWORD', self.__wp_site.credentials.password)
 
             if (self.__wp_site.site_url is not None and len(self.__wp_site.site_url) > 0):
-                self.__wp_config.set('WP_SITEURL', self.__wp_site.site_url)
+                wp_config.set('WP_SITEURL', self.__wp_site.site_url)
 
             if (self.__wp_site.site_home is not None and len(self.__wp_site.site_home) > 0):
-                self.__wp_config.set('WP_HOME', self.__wp_site.site_home)
+                wp_config.set('WP_HOME', self.__wp_site.site_home)
 
         self.__log.debug(" Site Host='%s', Site Url='%s', Site Path='%s', Database Name='%s', Database Host='%s', Database User='%s', Database Password='%s'", # pylint: disable=line-too-long
-                        self.__wp_config.get('WP_HOME'),
-                        self.__wp_config.get('WP_SITEURL'),
+                        wp_config.get('WP_HOME'),
+                        wp_config.get('WP_SITEURL'),
                         self.__wp_site.site_path,
-                        self.__wp_config.get('DB_NAME'),
-                        self.__wp_config.get('DB_HOST'),
-                        self.__wp_config.get('DB_USER'),
-                        self.__wp_config.get('DB_PASSWORD')
+                        wp_config.get('DB_NAME'),
+                        wp_config.get('DB_HOST'),
+                        wp_config.get('DB_USER'),
+                        wp_config.get('DB_PASSWORD')
                         )
 
     #########################################################################
@@ -163,7 +163,7 @@ class WpInternalRestore:
 
             self.__log.info('Ensuring the database exists...')
             if not self.__what_if:
-                wpdb.ensure_database_setup(admin_credentials=self.__wp_site.admin_credentials, force=force)
+                wpdb.ensure_database_setup(admin_credentials=self.__wp_site.admin_credentials, force=WpRestoreMode.DATABASE in restore_mode)
         except FileNotFoundError as error:
             self.__log.exception(error)
             self.__log.fatal('mysql was not found. Please install it and try again.')
@@ -175,11 +175,11 @@ class WpInternalRestore:
         restore_args = [
             'mysql',
             '--host',
-            self.__wp_config.get('DB_HOST'),
+            self.__wp_site.db_host,
             '--user',
             self.__wp_site.admin_credentials.username,
             '-p' + self.__wp_site.admin_credentials.password,
-            self.__wp_config.get('DB_NAME'),
+            self.__wp_site.db_name,
             '--execute',
             'source {};'.format(db_dump_filename)
         ]
