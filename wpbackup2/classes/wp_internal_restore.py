@@ -172,13 +172,11 @@ class WpInternalRestore:
 
             raise WpDatabaseMysqlFailed(message="mysql was not found", stdOut=None, stdError=None) from error
 
-        db_dump_filename = os.path.join(self.__temp_path, DB_DUMP_ARCNAME)
+        db_dump_filename = str(os.path.join(self.__temp_path, DB_DUMP_ARCNAME))
 
         if not os.path.exists(db_dump_filename):
             self.__log.info('Failed to extract database.sql from the backup.  Possible corrupt backup.')
             raise WpDatabaseRestoreFailed(db_dump_filename, None, None)
-        else:
-            self.__log.info("Restoring Database from '%s'", db_dump_filename)
 
         restore_args = [
             'mysql',
@@ -193,8 +191,8 @@ class WpInternalRestore:
         ]
 
         try:
-            self.__log.info('Restoring database from "%s"...', db_dump_filename)
-            self.__log.debug("RESTORE CMD: %s", restore_args)
+            self.__log.info("Restoring database from '%s'", db_dump_filename)
+            self.__log.info("RESTORE CMD: %s", restore_args)
 
             if not self.__what_if:
                 completed = subprocess.run(restore_args, capture_output=True) # pylint: disable=subprocess-run-check
