@@ -3,7 +3,6 @@
 # pylint: disable=line-too-long
 
 import logging
-import tempfile
 import datetime
 
 from wpbackup2.classes.wp_internal_restore import WpInternalRestore
@@ -13,23 +12,18 @@ from wpbackup2.classes.wp_internal_backup import WpBackupMode
 from wpbackup2.classes.wp_internal_restore import WpRestoreMode
 from wpbackup2.classes.wpsite import WpSite
 
-
 class WpBackup:
     """ WpBackup """
 
     __what_if = False
-    __temp_dir = None
+    __temp_path = "/tmp"
 
     #########################################################################
     def __init__(self, what_if=False, temp_dir=None):
         self.__log = logging.getLogger(__name__)
 
         self.__what_if = what_if
-        self.__temp_dir = temp_dir if not temp_dir is None else tempfile.TemporaryDirectory()
-
-    #########################################################################
-    def __del__(self):
-        self.__temp_dir = None
+        self.__temp_path = temp_dir if not temp_dir is None else "/tmp"
 
     #########################################################################
     def backup(self, wp_site, archive_filename, backup_mode=WpBackupMode.ALL):
@@ -46,7 +40,7 @@ class WpBackup:
 
         self.__log.info('Starting backup.')
 
-        wp_op = WpInternalBackup(wp_site, self.__temp_dir.name, what_if=self.__what_if)
+        wp_op = WpInternalBackup(wp_site, self.__temp_path, what_if=self.__what_if)
 
         if archive_filename is None or len(archive_filename) == 0:
             archive_filename = "wpbackup2-{}-{}.tar.gz".format(wp_site.db_name, datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
@@ -78,7 +72,7 @@ class WpBackup:
 
         self.__log.info('Starting restore.')
 
-        wp_op = WpInternalRestore(wp_site, self.__temp_dir.name, what_if=self.__what_if)
+        wp_op = WpInternalRestore(wp_site, self.__temp_path, what_if=self.__what_if)
 
         wp_op.restore(archive_filename=archive_filename, restore_mode=restore_mode)
 
