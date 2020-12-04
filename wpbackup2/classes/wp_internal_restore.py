@@ -192,7 +192,7 @@ class WpInternalRestore:
 
         try:
             self.__log.info("Restoring database from '%s'", db_dump_filename)
-            self.__log.info("RESTORE CMD: %s", restore_args)
+            self.__log.debug("RESTORE CMD: %s", restore_args)
 
             if not self.__what_if:
                 completed = subprocess.run(restore_args, capture_output=True) # pylint: disable=subprocess-run-check
